@@ -1,3 +1,7 @@
+# Project: Network Monitor Tool
+# Application developed by: codewithj4ke - September 2024
+# Learning Python programming with the assistance of AI and online courses
+
 import tkinter as tk
 import psutil
 import matplotlib.pyplot as plt
