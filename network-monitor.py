@@ -37,8 +37,14 @@ class SystemMonitor:
         self.info_frame = tk.Frame(self.root)
         self.info_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
-        self.text_widget = tk.Text(self.info_frame, wrap='word', height=25, width=40)  # Increased height and width
+        # Create a text widget and a scrollbar
+        self.text_widget = tk.Text(self.info_frame, wrap='word', height=25, width=40)
         self.text_widget.grid(row=0, column=0, sticky='nsew')
+
+        self.scrollbar = tk.Scrollbar(self.info_frame, orient='vertical', command=self.text_widget.yview)
+        self.scrollbar.grid(row=0, column=1, sticky='ns')
+
+        self.text_widget.config(yscrollcommand=self.scrollbar.set)
 
         # Create a frame for the button
         self.refresh_button_frame = tk.Frame(self.info_frame)
@@ -165,6 +171,9 @@ class SystemMonitor:
         self.canvas.draw()
 
     def update_text_widget(self):
+        # Save the current scroll position
+        y_scroll_position = self.text_widget.yview()[0]
+
         self.text_widget.delete(1.0, tk.END)
 
         self.text_widget.insert(tk.END, "Network Information:\n", 'bold')
@@ -186,6 +195,9 @@ class SystemMonitor:
         self.text_widget.insert(tk.END, "\nStorage Information:\n", 'bold')
         storage_info = self.get_storage_info()
         self.text_widget.insert(tk.END, self.format_storage_info(storage_info))
+
+        # Restore the scroll position
+        self.text_widget.yview_moveto(y_scroll_position)
 
         self.refresh_button_frame.grid(row=1, column=0, pady=5, sticky='ew')
 
