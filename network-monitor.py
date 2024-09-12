@@ -3,6 +3,7 @@
 # Learning Python programming with the assistance of AI and online courses
 
 import tkinter as tk
+from tkinter import ttk  # Import ttk for tabbed interface
 import psutil
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -10,6 +11,10 @@ import time
 import socket
 import threading
 import logging
+import requests  # Add this import
+from PIL import Image, ImageTk  # Add this import
+from io import BytesIO  # Add this import
+
 
 # Setup logging
 logging.basicConfig(filename='system_monitor.log', level=logging.INFO,
@@ -28,6 +33,10 @@ class SystemMonitor:
         self.root = root
         self.setup_ui()
         self.start_update_thread()
+
+    from PIL import Image, ImageTk
+    import requests
+    from io import BytesIO
 
     def setup_ui(self):
         self.root.title("Network Monitor Tool")
@@ -51,12 +60,26 @@ class SystemMonitor:
         self.info_frame = tk.Frame(self.root, bg=self.bg_color)
         self.info_frame.pack(side=tk.LEFT, padx=10, pady=10, fill=tk.BOTH, expand=True)
 
+        # Create a frame for the header and logo
+        self.header_frame = tk.Frame(self.info_frame, bg=self.bg_color)
+        self.header_frame.grid(row=0, column=0, pady=(0, 5), sticky='w')
+
+        # Load and add the logo image
+        response = requests.get("https://cdn-icons-png.flaticon.com/512/2593/2593154.png")
+        logo_image = Image.open(BytesIO(response.content))
+        logo_image = logo_image.resize((40, 40))  # Adjust size as needed
+        self.logo_photo = ImageTk.PhotoImage(logo_image)
+        self.logo_label = tk.Label(self.header_frame, image=self.logo_photo, bg=self.bg_color)
+        self.logo_label.pack(side=tk.LEFT)
+
         # Create a header label
-        self.header_label = tk.Label(self.info_frame, text="Network Monitor Tool", font=self.header_font, bg=self.bg_color, fg=self.fg_color)
-        self.header_label.grid(row=0, column=0, pady=(0, 5), sticky='w')
+        self.header_label = tk.Label(self.header_frame, text="Network Monitor Tool", font=self.header_font,
+                                     bg=self.bg_color, fg=self.fg_color)
+        self.header_label.pack(side=tk.LEFT, padx=10)
 
         # Create a text widget and a scrollbar
-        self.text_widget = tk.Text(self.info_frame, wrap='word', height=25, width=50, font=self.text_font, bg='#1E2A32', fg=self.fg_color)
+        self.text_widget = tk.Text(self.info_frame, wrap='word', height=25, width=50, font=self.text_font, bg='#1E2A32',
+                                   fg=self.fg_color)
         self.text_widget.grid(row=1, column=0, sticky='nsew')
 
         self.scrollbar = tk.Scrollbar(self.info_frame, orient='vertical', command=self.text_widget.yview)
@@ -68,7 +91,8 @@ class SystemMonitor:
         self.refresh_button_frame = tk.Frame(self.info_frame, bg=self.bg_color)
         self.refresh_button_frame.grid(row=2, column=0, pady=10, sticky='w')
 
-        self.refresh_button = tk.Button(self.refresh_button_frame, text="Force Refresh", command=self.display_info, bg=self.button_bg, fg=self.button_fg, font=self.button_font)
+        self.refresh_button = tk.Button(self.refresh_button_frame, text="Force Refresh", command=self.display_info,
+                                        bg=self.button_bg, fg=self.button_fg, font=self.button_font)
         self.refresh_button.pack()
 
         # Create a frame for the plot
